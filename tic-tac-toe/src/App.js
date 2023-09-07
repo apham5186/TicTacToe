@@ -4,7 +4,9 @@ import './App.css';
 import {Board} from './components/Board'
 import {ScoreBoard} from'./components/ScoreBoard'
 import {ResetButton} from'./components/ResetButton'
+
 function App() {
+  
   const WIN_CONDITIONS = [
     [0,1,2],
     [3,4,5],
@@ -15,19 +17,37 @@ function App() {
     [0,4,8],
     [2,4,6]
   ]
+  
+  const GAME_STATE = {
+  PLAYER_TURN: "player_turn",
+  AI_TURN: "ai_turn",
+  PLAYER_WON: "player_won",
+  AI_WON: "player_o_won",
+  DRAW: "game_draw",
+  ERROR: "game_error"
+  }
+  
   const [board, setBoard] = useState(Array(9).fill(null));
+  const [moveCount, setMoveCount] = useState(0);
   const [xPlaying, setXplaying] = useState(true);
   const [scores, setScores] =useState({xScore:0, oScore:0})
   const [gameOver, setGameOver] = useState(false)
+  const MAX_MOVES = 8;
+  
+  const isDraw = (moveCount) => {
+    return moveCount === MAX_MOVES;
+  }
 
     const handleBoxClick = (boxIdx) => {
       const updatedBoard = board.map((value, idx) =>{
         if(idx === boxIdx){
+          setMoveCount(moveCount+1)
           return xPlaying === true? "X": "O";
         }else{
           return value;
         }
       })
+
     const winner = checkWinner(updatedBoard)
     if(winner){
       if(winner ==="O"){
@@ -39,6 +59,11 @@ function App() {
         xScore +=1
         setScores({...scores,xScore})
       }
+    }
+    const draw = isDraw(moveCount)
+    console.log(draw)
+    if(draw){
+      setGameOver(true)
     }
     setBoard(updatedBoard)
     setXplaying(!xPlaying)
@@ -56,6 +81,7 @@ function App() {
     const resetBoard = () => {
       setGameOver(false);
       setXplaying(true);
+      setMoveCount(0);
       setBoard(Array(9).fill(null))
     }
   return (
